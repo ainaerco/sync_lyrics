@@ -1,0 +1,93 @@
+# 🛠️ Task: Streamlit Custom Component — Interactive Audio Waveform Player
+
+## 🎯 Objective
+Create a Streamlit custom component that displays an interactive audio waveform visualization, allowing users to:
+- View the waveform of an uploaded audio file.
+- Play/pause the audio.
+- Scrub through the waveform using mouse interaction.
+- See playback progress visually segmented (e.g., played vs. unplayed).
+- Control playback speed.
+
+The component should closely match the visual and functional design shown in the reference image.
+
+---
+
+## 📦 Functional Requirements
+
+### 1. **Waveform Display**
+- Render the waveform of the uploaded audio file.
+- Use two-tone coloring:
+  - **Orange** for the portion already played.
+  - **Gray** for the portion yet to be played.
+- Display waveform as a horizontal bar with amplitude peaks.
+
+### 2. **Audio Playback**
+- Support standard audio formats (e.g., `.mp3`, `.wav`, `.ogg`).
+- Include playback controls:
+  - Play/Pause toggle.
+  - Playback speed selector (e.g., 0.5x, 1x, 1.5x, 2x).
+
+### 3. **Scrubbing Interaction**
+- Allow users to click or drag along the waveform to seek to a specific timestamp.
+- Update audio playback position and waveform coloring accordingly.
+
+### 4. **Timestamp Display**
+- Show current playback time and total duration (e.g., `1:21 / 2:58`).
+- Update dynamically during playback and scrubbing.
+
+---
+
+## 🧩 UI Layout (Based on Reference Image)
+
+---
+
+## 🧪 Component Behavior
+
+- On file upload, generate waveform and initialize player.
+- On play, animate waveform progress and update timestamp.
+- On mouse hover or drag, show preview position.
+- On click, seek to selected position and update waveform.
+- On speed change, adjust playback rate without affecting waveform rendering.
+
+---
+
+## 🧰 Technical Notes
+
+- Use [WaveSurfer.js](https://wavesurfer-js.org/) or similar for waveform rendering and audio control.
+- Wrap the JS logic in a Streamlit custom component using `streamlit-component-lib`.
+- Ensure compatibility with Streamlit’s file uploader and Python backend.
+- Provide fallback UI for unsupported browsers or file types.
+
+---
+
+## 📁 Deliverables
+
+- `waveform_player` component folder with:
+  - `frontend/` (React or vanilla JS + WaveSurfer integration)
+  - `__init__.py` and Python wrapper
+  - Example usage script (`app.py`)
+- README with setup instructions and usage examples.
+- Optional: test suite for basic functionality.
+
+---
+
+## 🧠 Bonus Features (Optional)
+- Volume control slider.
+- Loop toggle.
+- Waveform zoom.
+- Style presets (e.g., dark mode, compact layout).
+
+---
+
+## 🧪 Testing Criteria
+
+- ✅ Audio loads and waveform renders correctly.
+- ✅ Playback controls function as expected.
+- ✅ Scrubbing updates audio and waveform.
+- ✅ Timestamps and progress bar sync with playback.
+- ✅ Component works in latest Chrome, Firefox, and Edge.
+
+---
+
+## 📌 Notes
+This component will be used in media management workflows, so clarity, responsiveness, and modularity are key. Prioritize reproducibility, safety (no accidental overwrites), and transparent user feedback.

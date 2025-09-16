@@ -1,0 +1,113 @@
+sync_lyrics\project_plan.txt
+Python Web App for Synced Lyrics Generation – Project Plan (Streamlit Version)
+
+---
+
+1. Project Overview
+
+Goal:
+Build a Python-based web app using Streamlit where users upload an audio file and paste unsynced lyrics. The app displays the audio’s waveform or spectrogram, allows scrubbing, and lets users assign timestamps to each lyric line for synchronization.
+
+---
+
+2. Tech Stack
+
+- App Framework: Streamlit (no Flask, FastAPI, or other frameworks)
+- Frontend: Streamlit widgets, HTML5 audio (via Streamlit components), minimal vanilla JS if needed
+- Audio Processing:
+    - librosa or pydub for audio analysis
+    - ffmpeg for audio conversion (if needed)
+- Data Storage: In-memory (Streamlit session state)
+
+---
+
+3. Core Features & Flow
+
+3.1. User Flow
+
+1. Upload Audio: User uploads an audio file (mp3, wav, etc.)
+2. Upload Lyrics: User uploads a plain text (.txt) file containing unsynced lyrics (one line per lyric).
+3. Audio Visualization: App displays the audio waveform or spectrogram (as an image).
+4. Scrubbing & Tagging:
+    - User scrubs through the audio using an audio player (Streamlit component or HTML5 audio).
+    - For each lyric line, user clicks a button to set the current timestamp as the sync point.
+5. Export: User can export the synced lyrics in LRC or another format.
+
+---
+
+3.2. Streamlit App Tasks
+
+- Audio File Handling:
+    - Upload and temporarily store audio files.
+    - Optionally convert to a standard format.
+- Waveform/Spectrogram Generation:
+    - Generate waveform or spectrogram data.
+    - Display waveform in the app.
+- Lyrics Handling:
+    - Receive and store uploaded lyrics from a .txt file.
+    - Split lyrics into lines for tagging.
+- Sync Data Storage:
+    - Store timestamps for each lyric line (in session state).
+- Export Functionality:
+    - Generate LRC or other synced lyric formats for download.
+
+---
+
+3.3. Streamlit UI Tasks
+
+- Audio Player:
+    - Use Streamlit audio widget for playback, pause, and scrubbing.
+    - Display current playback time (may require Streamlit component).
+- Waveform/Spectrogram Display:
+    - Show generated waveform/spectrogram.
+- Lyrics Editor:
+    - Display lyrics line-by-line.
+    - Allow user to assign current audio time to each line using a "Set Time" button.
+    - The next unsynced lyric line is assigned the timestamp when the button is pressed.
+    - Highlight the currently active lyric line during audio playback.
+    - Show which lines are synced/unsynced.
+- Export Button:
+    - Download synced lyrics file.
+
+---
+
+4. Detailed Steps
+
+4.1. Streamlit Implementation
+
+- Set up a Streamlit app (`streamlit run app.py`).
+- Use Streamlit widgets for:
+    - Audio upload
+    - Lyrics file upload
+    - Displaying waveform/spectrogram
+    - Assigning timestamps to lyrics
+    - Exporting synced lyrics
+- Use Streamlit session state to store audio, lyrics, and sync data.
+- Use Python functions for audio processing and export.
+
+---
+
+5. Optional Enhancements
+
+- Auto-Sync Suggestion: Use speech-to-text or beat detection to suggest initial sync points.
+- User Accounts: Allow saving and editing projects (requires authentication, out of scope for MVP).
+- Multiple Export Formats: Support for LRC, SRT, etc.
+
+---
+
+6. Example Workflow
+
+1. User uploads song.mp3.
+2. User uploads lyrics.txt:
+    (Each line in the file is a lyric line)
+3. App displays waveform/spectrogram image.
+4. User plays audio, scrubs to the start of "Line one", clicks "Set Time".
+5. Repeat for each line.
+6. User clicks "Export" to download song.lrc.
+
+---
+
+NOTES:
+- No Flask, FastAPI, or other web frameworks—**Streamlit only**.
+- All audio processing and visualization handled server-side in Python.
+- The interface should be simple and intuitive, focusing on usability for manual lyric syncing.

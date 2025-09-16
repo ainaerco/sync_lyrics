@@ -1,0 +1,37 @@
+{
+  "name": "stlite-desktop-sample-file-persistence-idbfs",
+  "version": "0.89.1",
+  "license": "Apache-2.0",
+  "main": "./build/electron/main.js",
+  "scripts": {
+    "dump": "dump-stlite-desktop-artifacts",
+    "serve": "cross-env NODE_ENV=production electron .",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder"
+  },
+  "build": {
+    "files": [
+      "build/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "devDependencies": {
+    "@stlite/desktop": "^0.89.1",
+    "cross-env": "^7.0.3",
+    "electron": "34.3.0",
+    "electron-builder": "^26.0.12"
+  },
+  "stlite": {
+    "desktop": {
+      "files": [
+        "app.py"
+      ],
+      "entrypoint": "app.py",
+      "idbfsMountpoints": [
+        "/mnt"
+      ]
+    }
+  }
+}
