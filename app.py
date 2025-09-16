@@ -110,8 +110,44 @@ else:
 # --- 5. Export Synced Lyrics Section ---
 st.header("5. Export Synced Lyrics")
 if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
-    # Placeholder for export functionality
-    st.success("Export functionality coming soon: Download your synced lyrics as an LRC file.")
+    import os
+
+    # Persist any final user edits before generating the file.
+    for i in range(len(st.session_state.lyrics)):
+        if f"lyric_{i}" in st.session_state:
+            st.session_state.lyrics[i] = st.session_state[f"lyric_{i}"]
+        if f"timestamp_{i}" in st.session_state:
+            st.session_state.sync_times[i] = st.session_state[f"timestamp_{i}"]
+
+    # Generate LRC content
+    lrc_content = []
+    for i, lyric in enumerate(st.session_state.lyrics):
+        timestamp = st.session_state.sync_times[i]
+        if timestamp and is_valid_timestamp_format(timestamp):
+            # Convert mm:ss.ms to mm:ss.xx (hundredths of a second)
+            if '.' in timestamp:
+                parts = timestamp.split('.')
+                ms = parts[1]
+                xx = ms.ljust(2, '0')[:2]
+                formatted_timestamp = f"{parts[0]}.{xx}"
+            else:
+                formatted_timestamp = f"{timestamp}.00"
+            
+            lrc_content.append(f"[{formatted_timestamp}]{lyric}")
+
+    lrc_string = "\n".join(lrc_content)
+
+    file_name = "lyrics.lrc"
+    if st.session_state.get("audio_file_name"):
+        base_name, _ = os.path.splitext(st.session_state.audio_file_name)
+        file_name = f"{base_name}.lrc"
+
+    st.download_button(
+        label="Download .lrc file",
+        data=lrc_string,
+        file_name=file_name,
+        mime="text/plain"
+    )
 else:
     st.info("Sync at least one lyric line to enable export.")
 
