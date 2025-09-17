@@ -1,24 +1,28 @@
+import os
+import re
+
 import streamlit as st
 from waveform_player import waveform_player
-import re
-import os
+
 
 # --- Helper Functions ---
 def is_valid_timestamp_format(timestamp):
     """Check if timestamp is in mm:ss or mm:ss.fff format"""
     if not isinstance(timestamp, str):
         return False
-    pattern = r'^\d{1,2}:\d{2}(\.\d{1,3})?$' # Corrected regex pattern
+    pattern = r"^\d{1,2}:\d{2}(\.\d{1,3})?$"  # Corrected regex pattern
     return re.match(pattern, timestamp) is not None
+
 
 def persist_editor_state():
     """Save the current values from the text input widgets into the canonical session state lists."""
-    if 'lyrics' in st.session_state and st.session_state.lyrics:
+    if "lyrics" in st.session_state and st.session_state.lyrics:
         for i in range(len(st.session_state.lyrics)):
             if f"lyric_{i}" in st.session_state:
                 st.session_state.lyrics[i] = st.session_state[f"lyric_{i}"]
             if f"timestamp_{i}" in st.session_state:
                 st.session_state.sync_times[i] = st.session_state[f"timestamp_{i}"]
+
 
 def clear_editor_widget_state(num_lines):
     """Clear session state for all lyric editor widgets to prevent stale data."""
@@ -28,11 +32,12 @@ def clear_editor_widget_state(num_lines):
         st.session_state.pop(f"set_{i}", None)
         st.session_state.pop(f"delete_{i}", None)
 
+
 # --- App Config ---
 st.set_page_config(
     page_title="Synced Lyrics Generator",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # --- Title and Description ---
@@ -83,7 +88,9 @@ if lyrics_file and (st.session_state.lyrics_file_name != lyrics_file.name):
     clear_editor_widget_state(st.session_state.num_lyrics_lines)
     st.session_state.lyrics_file_name = lyrics_file.name
     lyrics_content = lyrics_file.read().decode("utf-8")
-    st.session_state.lyrics = [line.strip() for line in lyrics_content.splitlines() if line.strip()]
+    st.session_state.lyrics = [
+        line.strip() for line in lyrics_content.splitlines() if line.strip()
+    ]
     st.session_state.sync_times = [""] * len(st.session_state.lyrics)
     st.session_state.num_lyrics_lines = len(st.session_state.lyrics)
     st.rerun()
@@ -121,9 +128,19 @@ if audio_file:
 
     for i in range(len(st.session_state.lyrics)):
         with col1:
-            st.text_input("Lyric", value=st.session_state.lyrics[i], key=f"lyric_{i}", label_visibility="collapsed")
+            st.text_input(
+                "Lyric",
+                value=st.session_state.lyrics[i],
+                key=f"lyric_{i}",
+                label_visibility="collapsed",
+            )
         with col2:
-            st.text_input("Timestamp", value=st.session_state.sync_times[i], key=f"timestamp_{i}", label_visibility="collapsed")
+            st.text_input(
+                "Timestamp",
+                value=st.session_state.sync_times[i],
+                key=f"timestamp_{i}",
+                label_visibility="collapsed",
+            )
         with col3:
             b1, b2 = st.columns(2)
             with b1:
@@ -133,7 +150,9 @@ if audio_file:
                     minutes = int(current_time // 60)
                     seconds = int(current_time % 60)
                     milliseconds = int((current_time % 1) * 1000)
-                    st.session_state.sync_times[i] = f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+                    st.session_state.sync_times[i] = (
+                        f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+                    )
                     st.rerun()
             with b2:
                 if st.button("Del", key=f"delete_{i}", use_container_width=True):
@@ -144,8 +163,8 @@ if audio_file:
                     clear_editor_widget_state(st.session_state.num_lyrics_lines + 1)
                     st.rerun()
 
-    st.write("") # Spacer
-    if st.button("＋ Add New Lyric"):
+    st.write("")  # Spacer
+    if st.button("+ Add New Lyric"):
         persist_editor_state()
         st.session_state.lyrics.append("")
         st.session_state.sync_times.append("")
@@ -158,21 +177,21 @@ else:
 # --- 5. Export Synced Lyrics Section ---
 st.header("5. Export Synced Lyrics")
 if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
-    persist_editor_state() # Save any last-minute edits
+    persist_editor_state()  # Save any last-minute edits
 
     # Generate LRC content
     lrc_content = []
     for i, lyric in enumerate(st.session_state.lyrics):
         timestamp = st.session_state.sync_times[i]
         if timestamp and is_valid_timestamp_format(timestamp):
-            if '.' in timestamp:
-                parts = timestamp.split('.')
+            if "." in timestamp:
+                parts = timestamp.split(".")
                 ms = parts[1]
-                xx = ms.ljust(2, '0')[:2]
+                xx = ms.ljust(2, "0")[:2]
                 formatted_timestamp = f"{parts[0]}.{xx}"
             else:
                 formatted_timestamp = f"{timestamp}.00"
-            
+
             lrc_content.append(f"[{formatted_timestamp}]{lyric}")
 
     lrc_string = "\n".join(lrc_content)
@@ -186,7 +205,7 @@ if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
         label="Download .lrc file",
         data=lrc_string,
         file_name=file_name,
-        mime="text/plain"
+        mime="text/plain",
     )
 else:
     st.info("Sync at least one lyric line to enable export.")
@@ -198,4 +217,4 @@ with st.sidebar:
     This app helps you manually sync lyrics to music for karaoke or lyric videos.
     - Built with [Streamlit](https://streamlit.io/)
     """)
-    st.markdown("**MVP Version** – core features only.")
+    st.markdown("**MVP Version** - core features only.")
