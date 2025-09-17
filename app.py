@@ -97,13 +97,14 @@ def parse_lrc(content):
         match = re.match(timestamp_pattern, line)
         if match:
             timestamp = match.group(1)
-            lyric = line[match.end():].strip()
+            lyric = line[match.end() :].strip()
             sync_times.append(timestamp)
             lyrics.append(lyric)
         else:
             sync_times.append("")
             lyrics.append(line)
     return lyrics, sync_times
+
 
 # Reset and load new lyrics if new lyrics file is uploaded
 if lyrics_file and (st.session_state.lyrics_file_name != lyrics_file.name):
@@ -147,50 +148,62 @@ if audio_file:
         st.session_state.num_lyrics_lines = 1
 
     st.write("Edit lyrics, add/remove lines, and click 'Set' to capture timestamps.")
-
-    col1, col2, col3 = st.columns([7, 3, 2], gap="small")
-    col1.write("**Lyric Text**")
-    col2.write("**Timestamp (mm:ss.ms)**")
-    col3.write("**Actions**")
+    # Compact button CSS to make action buttons appear as a tight stripe
+    st.markdown(
+        """
+        <style>
+        /* Reduce Streamlit button padding and margins globally (keeps UI tight)
+           This helps small action buttons stay on one line and appear contiguous. */
+        .stButton>button {
+            padding: 4px 8px !important;
+            margin: 0 !important;
+            min-width: 44px !important;
+            line-height: 1 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    # Header row
+    header_cols = st.columns([7, 3, 1], gap="small")
+    header_cols[0].write("**Lyric Text**")
+    header_cols[1].write("**Timestamp (mm:ss.ms)**")
+    header_cols[2].write("**Actions**")
 
     for i in range(len(st.session_state.lyrics)):
-        with col1:
-            st.text_input(
-                "Lyric",
-                value=st.session_state.lyrics[i],
-                key=f"lyric_{i}",
-                label_visibility="collapsed",
+        row_cols = st.columns([7, 3, 1], gap="small")
+        row_cols[0].text_input(
+            "Lyric",
+            value=st.session_state.lyrics[i],
+            key=f"lyric_{i}",
+            label_visibility="collapsed",
+        )
+        row_cols[1].text_input(
+            "Timestamp",
+            value=st.session_state.sync_times[i],
+            key=f"timestamp_{i}",
+            label_visibility="collapsed",
+        )
+        # action buttons in a compact two-cell stripe (no inter-column gap)
+        action_cols = row_cols[2].columns([1, 1], gap="small")
+        if action_cols[0].button("Set", key=f"set_{i}"):
+            persist_editor_state()
+            current_time = st.session_state.get("waveform_player", 0.0)
+            minutes = int(current_time // 60)
+            seconds = int(current_time % 60)
+            milliseconds = int((current_time % 1) * 1000)
+            st.session_state.sync_times[i] = (
+                f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
             )
-        with col2:
-            st.text_input(
-                "Timestamp",
-                value=st.session_state.sync_times[i],
-                key=f"timestamp_{i}",
-                label_visibility="collapsed",
-            )
-        with col3:
-            b1, b2 = st.columns(2)
-            with b1:
-                if st.button("Set", key=f"set_{i}", use_container_width=True):
-                    persist_editor_state()
-                    current_time = st.session_state.get("waveform_player", 0.0)
-                    minutes = int(current_time // 60)
-                    seconds = int(current_time % 60)
-                    milliseconds = int((current_time % 1) * 1000)
-                    st.session_state.sync_times[i] = (
-                        f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
-                    )
-                    st.rerun()
-            with b2:
-                if st.button("Del", key=f"delete_{i}", use_container_width=True):
-                    persist_editor_state()
-                    st.session_state.lyrics.pop(i)
-                    st.session_state.sync_times.pop(i)
-                    st.session_state.num_lyrics_lines = len(st.session_state.lyrics)
-                    clear_editor_widget_state(st.session_state.num_lyrics_lines + 1)
-                    st.rerun()
+            st.rerun()
+        if action_cols[1].button("Del", key=f"delete_{i}"):
+            persist_editor_state()
+            st.session_state.lyrics.pop(i)
+            st.session_state.sync_times.pop(i)
+            st.session_state.num_lyrics_lines = len(st.session_state.lyrics)
+            clear_editor_widget_state(st.session_state.num_lyrics_lines + 1)
+            st.rerun()
 
-    st.write("")  # Spacer
     if st.button("+ Add New Lyric"):
         persist_editor_state()
         st.session_state.lyrics.append("")
