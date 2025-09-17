@@ -1,6 +1,5 @@
 import os
 import re
-
 import streamlit as st
 from waveform_player import waveform_player
 
@@ -65,11 +64,12 @@ audio_file = st.file_uploader(
     type=["mp3", "wav", "ogg", "flac"],
 )
 
+
 # --- 2. Upload Lyrics File Section ---
 st.header("2. Upload Lyrics File")
 lyrics_file = st.file_uploader(
-    "Upload a .txt file with your lyrics (one line per lyric):",
-    type=["txt"],
+    "Upload a .txt or .lrc file with your lyrics:",
+    type=["txt", "lrc"],
 )
 
 # --- State Reset Logic ---
@@ -83,15 +83,42 @@ if audio_file and st.session_state.get("audio_file_name") != audio_file.name:
     st.session_state.num_lyrics_lines = 0
     st.rerun()
 
+
+# --- LRC Parsing Helper ---
+def parse_lrc(content):
+    """Parse .lrc content into (timestamps, lyrics) lists."""
+    timestamp_pattern = r"\[(\d{1,2}:\d{2}(?:\.\d{2,3})?)\]"
+    lyrics = []
+    sync_times = []
+    for line in content.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        match = re.match(timestamp_pattern, line)
+        if match:
+            timestamp = match.group(1)
+            lyric = line[match.end():].strip()
+            sync_times.append(timestamp)
+            lyrics.append(lyric)
+        else:
+            sync_times.append("")
+            lyrics.append(line)
+    return lyrics, sync_times
+
 # Reset and load new lyrics if new lyrics file is uploaded
 if lyrics_file and (st.session_state.lyrics_file_name != lyrics_file.name):
     clear_editor_widget_state(st.session_state.num_lyrics_lines)
     st.session_state.lyrics_file_name = lyrics_file.name
     lyrics_content = lyrics_file.read().decode("utf-8")
-    st.session_state.lyrics = [
-        line.strip() for line in lyrics_content.splitlines() if line.strip()
-    ]
-    st.session_state.sync_times = [""] * len(st.session_state.lyrics)
+    if lyrics_file.name.lower().endswith(".lrc"):
+        lyrics, sync_times = parse_lrc(lyrics_content)
+        st.session_state.lyrics = lyrics
+        st.session_state.sync_times = sync_times
+    else:
+        st.session_state.lyrics = [
+            line.strip() for line in lyrics_content.splitlines() if line.strip()
+        ]
+        st.session_state.sync_times = [""] * len(st.session_state.lyrics)
     st.session_state.num_lyrics_lines = len(st.session_state.lyrics)
     st.rerun()
 
@@ -176,10 +203,10 @@ else:
 
 # --- 5. Export Synced Lyrics Section ---
 st.header("5. Export Synced Lyrics")
-if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
+if any(is_valid_timestamp_format(ts) for ts in st.session_state.sync_times):
     persist_editor_state()  # Save any last-minute edits
 
-    # Generate LRC content
+    # Generate LRC content (include lines without timestamps)
     lrc_content = []
     for i, lyric in enumerate(st.session_state.lyrics):
         timestamp = st.session_state.sync_times[i]
@@ -191,8 +218,9 @@ if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
                 formatted_timestamp = f"{parts[0]}.{xx}"
             else:
                 formatted_timestamp = f"{timestamp}.00"
-
             lrc_content.append(f"[{formatted_timestamp}]{lyric}")
+        else:
+            lrc_content.append(lyric)
 
     lrc_string = "\n".join(lrc_content)
 
@@ -208,7 +236,7 @@ if st.session_state.lyrics and any(t for t in st.session_state.sync_times):
         mime="text/plain",
     )
 else:
-    st.info("Sync at least one lyric line to enable export.")
+    st.info("Sync at least one lyric line with a valid timestamp to enable export.")
 
 # --- Sidebar: About/Help ---
 with st.sidebar:

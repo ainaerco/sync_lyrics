@@ -50,6 +50,8 @@ Build a Python-based web app using Streamlit where users upload an audio file an
 - **[COMPLETED]** Timestamp Assignment: A "Set" button assigns the current audio time to each line.
 - **[NOT IMPLEMENTED]** Active Lyric Highlighting: The app does not yet highlight the lyric line that corresponds to the current audio playback time.
 - **[COMPLETED]** Export Button: A download button is provided to get the final .lrc file.
+- **[COMPLETED]** Volume Control: Add a volume slider to the audio player.
+- **[COMPLETED]** Saving Incomplete Lyrics: Support saving/loading partially synced .lrc file.
 
 ---
 
@@ -58,7 +60,6 @@ Build a Python-based web app using Streamlit where users upload an audio file an
 - **Auto-Sync Suggestion:** Use speech-to-text or beat detection to suggest initial sync points.
 - **User Accounts:** Allow saving and editing projects.
 - **Multiple Export Formats:** Support for SRT, etc.
-- **Volume Control:** Add a volume slider to the audio player.
 
 ---
 
