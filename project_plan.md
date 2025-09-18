@@ -43,7 +43,7 @@ Build a Python-based web app using Streamlit where users upload an audio file an
 
 ### 3.3. Streamlit UI Tasks
 
-- **[COMPLETED]** Audio Player: A custom `waveform_player` component provides playback, pause, speed control, and scrubbing.
+-- **[COMPLETED]** Audio Player: A custom `wavesurfer_player` component provides playback, pause, speed control, and scrubbing.
 - **[COMPLETED]** Timestamp Display: The player shows the current playback time and total duration.
 - **[COMPLETED]** Waveform/Spectrogram Display: An interactive waveform is shown.
 - **[COMPLETED]** Lyrics Editor: Displays lyrics line-by-line with editable text and timestamp fields.

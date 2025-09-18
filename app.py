@@ -1,7 +1,7 @@
 import os
 import re
 import streamlit as st
-from waveform_player import waveform_player
+from wavesurfer_player import wavesurfer_player
 
 
 # --- Helper Functions ---
@@ -128,9 +128,9 @@ if lyrics_file and (st.session_state.lyrics_file_name != lyrics_file.name):
 st.header("3. Audio Visualization")
 if audio_file:
     audio_bytes = audio_file.read()
-    waveform_player(
+    wavesurfer_player(
         audio_bytes=audio_bytes,
-        key="waveform_player",
+        key="wavesurfer_player",
         height=120,
         show_controls=True,
     )
@@ -188,7 +188,7 @@ if audio_file:
         action_cols = row_cols[2].columns([1, 1], gap="small")
         if action_cols[0].button("Set", key=f"set_{i}"):
             persist_editor_state()
-            current_time = st.session_state.get("waveform_player", 0.0)
+            current_time = st.session_state.get("wavesurfer_player", 0.0)
             minutes = int(current_time // 60)
             seconds = int(current_time % 60)
             milliseconds = int((current_time % 1) * 1000)

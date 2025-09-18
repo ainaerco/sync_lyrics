@@ -62,7 +62,7 @@ The component should closely match the visual and functional design shown in the
 
 ## 📁 Deliverables
 
-- `waveform_player` component folder with:
+-- `wavesurfer_player` component folder with:
   - `frontend/` (React or vanilla JS + WaveSurfer integration)
   - `__init__.py` and Python wrapper
   - Example usage script (`app.py`)

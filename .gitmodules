@@ -1,0 +1,4 @@
+
+[submodule "components/wavesurfer_player"]
+	path = components/wavesurfer_player
+	url = https://github.com/ainaerco/streamlit_wavesurfer_player.git
